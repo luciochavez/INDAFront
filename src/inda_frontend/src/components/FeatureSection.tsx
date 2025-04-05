@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Coins, ShieldCheck, BarChart, Users, Share2, Zap } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
