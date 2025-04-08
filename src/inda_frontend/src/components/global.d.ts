@@ -20,6 +20,8 @@ const ckUSDCIdlFactory = ({ IDL }) => {
       requestConnect: (params?: RequestConnectParams) => Promise<string>;
       disconnect: () => Promise<boolean>;
       isConnected: () => Promise<boolean>;
+      getPrincipal: () => Promise<Principal>;
+      createActor: ({canisterId: String, interfaceFactory: interfaceFactory}) => Promise<>;
       requestTransfer: ({
         to: string,
         amount: number,

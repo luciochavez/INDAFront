@@ -11,7 +11,7 @@ import ModalProviderSelect from './ModalProviderSelect';
 import { connect } from 'http2';
 import { get } from 'http';
 
-
+/*
 declare global {
   interface Window {
     ic?: {
@@ -29,6 +29,7 @@ declare global {
     };
   }
 }
+  */
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
