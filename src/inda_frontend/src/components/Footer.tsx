@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Logo from './Logo';
 import { Twitter, Github, Globe } from 'lucide-react';
@@ -65,3 +64,4 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
+
