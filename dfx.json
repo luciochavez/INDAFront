@@ -15,7 +15,8 @@
       "source": [
         "src/inda_frontend/dist"
       ],
-      "type": "assets"
+      "type": "assets",
+      "build": "cd src/inda_frontend && npm install && npm run build"
     }
   },
   "defaults": {

@@ -1,13 +1,34 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      if (global === undefined) {
+        var global = window;
+      }
+    </script>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IndaSocial</title>
+    <title>Indasocial - Decentralized Social on Internet Computer</title>
+    <meta name="description" content="Indasocial is building a decentralized social platform powered by Internet Computer Protocol (ICP) with INDA token rewarding content creators and users." />
+    <meta name="author" content="Indasocial" />
+
+    <meta property="og:title" content="Indasocial - Decentralized Social on Internet Computer" />
+    <meta property="og:description" content="Indasocial is building a decentralized social platform powered by Internet Computer Protocol (ICP) with INDA token rewarding content creators and users." />
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@indasocial" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
+
   <body>
     <div id="root"></div>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
