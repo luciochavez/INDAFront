@@ -1,4 +1,8 @@
 {
-  "backend": {},
-  "frontend": {}
+  "backend": {
+    "ic": "meao4-vaaaa-aaaaf-qaoeq-cai"
+  },
+  "frontend": {
+    "ic": "mkcdu-oqaaa-aaaaf-qaofq-cai"
+  }
 }

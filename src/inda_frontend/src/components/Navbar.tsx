@@ -1,14 +1,35 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
 import Button from './Button';
-import {createActor} from "../declarations/backend"
-import { _SERVICE} from "../declarations/backend/backend.did";
+import { createActor } from "../declarations/backend";
+import { _SERVICE } from "../declarations/backend/backend.did";
 import { AuthClient } from "@dfinity/auth-client";
-import {ActorSubclass, HttpAgent, AnonymousIdentity, Identity} from "@dfinity/agent"
+import { ActorSubclass, HttpAgent, AnonymousIdentity, Identity } from "@dfinity/agent";
 import ModalProviderSelect from './ModalProviderSelect';
+import { connect } from 'http2';
+import { get } from 'http';
+
+/*
+declare global {
+  interface Window {
+    ic?: {
+      plug?: {
+        requestConnect: (options: { whitelist: string[], host: string }) => Promise<boolean>;
+        getPrincipal: () => Promise<any>;
+        agent?: {
+          getIdentity?: () => any;
+        };
+        createActor: (options: {
+          canisterId: string;
+          interfaceFactory: any;
+        }) => Promise<any>;
+      };
+    };
+  }
+}
+  */
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,11 +37,15 @@ const Navbar: React.FC = () => {
   const [identity, setIdentity] = useState<Identity>(new AnonymousIdentity());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [backend, setBackend] = useState<ActorSubclass<_SERVICE> | null>(null);
-  const [showModal, setShowModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [textButton, setTextButton] = useState("Connect Wallet");
+  const [isConnected, setIsConnected] = useState(false);
+  const [dataUser, setDataUser] = useState(null);
+  const [showModalRegister, setShowModalRegister] = useState(false);
 
-  const host = import.meta.env.VITE_DFX_NETWORK === "ic" ? "https://icp0.io" : "http://localhost:8080" ;
+  const host = import.meta.env.VITE_DFX_NETWORK === "ic" ? "https://icp0.io" : "http://localhost:4943";
   const canisterId = import.meta.env.VITE_CANISTER_ID_BACKEND;
+
   const links = [
     { name: 'Candid UI', href: 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=st35g-iaaaa-aaaal-ascpq-cai' },
     { name: 'Features', href: '#features' },
@@ -29,22 +54,129 @@ const Navbar: React.FC = () => {
     { name: 'Community', href: '#community' }
   ];
 
-  const login = async (providerUrl: string) => {
+  const loginWithII = async (providerUrl: string) => {
     const authClient = await AuthClient.create();
     await authClient.login({
-        identityProvider: providerUrl,
-        onSuccess: () => {
-            const identity = authClient.getIdentity();
-            setIdentity(identity);
-            setIsAuthenticated(true);
-        },
-        onError: (err) => console.error("Error al iniciar sesión:", err),
+      identityProvider: providerUrl,
+      onSuccess: async () => {
+        const identity = authClient.getIdentity();
+        setIdentity(identity);
+        setIsAuthenticated(true);
+
+        const agent = new HttpAgent({ identity, host });
+
+        if (import.meta.env.VITE_DFX_NETWORK === "local") {
+          try {
+            await agent.fetchRootKey();
+          } catch (error) {
+            console.warn("No se pudo obtener la root key en local:", error);
+          }
+        }
+
+        const actor = createActor(canisterId, { agent });
+        setBackend(actor);
+      },
+      onError: (err) => console.error("Error al iniciar sesión:", err),
     });
   };
 
-  const handleProviderSelection = async (providerUrl: string) => {
-    setIsModalOpen(false);      // Cierra el modal
-    await login(providerUrl);   // Llama a `login` con el proveedor seleccionado
+  const connectWithPlug = async () => {
+ 
+
+    if (!window.ic?.plug) {
+      alert("Plug Wallet no está disponible.");
+      return;
+    }
+
+    console.log("///////////");
+    console.log(canisterId);
+    console.log(host);
+    const connected = await window.ic.plug.requestConnect({
+      whitelist: [canisterId],
+      host,
+    });
+    
+    if (connected){
+      setIsConnected(true);
+    }
+    //const connected = await window.ic.plug.requestConnect();
+    console.log("///////////");
+    console.log(connected);
+    console.log("///////////");
+
+    if (connected) {
+      const plugPrincipal = await window.ic.plug.getPrincipal();
+      const plugIdentity = window.ic.plug.agent?.getIdentity?.();
+      setIdentity(plugIdentity);
+      setIsAuthenticated(true);
+
+      const backend_idl = (await import("../declarations/backend")).idlFactory;
+
+      const plugActor = await window.ic.plug.createActor({
+        canisterId,
+        interfaceFactory: backend_idl,
+      });
+
+      setBackend(plugActor);
+      setTextButton("Desconectar");
+
+      const user = await backend.signIn();
+      console.log(user);
+      if ("Ok" in user){
+        setDataUser(user.Ok);
+        console.log(dataUser);
+        
+      }else{
+        //console.log(user);
+        //console.log("/2");
+        //notUser;
+        setShowModalRegister(true);
+      }
+      
+
+    } else {
+      console.warn("No se pudo conectar con Plug.");
+      setTextButton("Connectar la Wallet");
+    }
+  };
+
+  const handleSubmit = async () => {
+    const input_mr_nombre=document.getElementById("mr_nombre") as HTMLInputElement;
+    const input_mr_apellido=document.getElementById("mr_apellido") as HTMLInputElement;
+    const input_mr_correo=document.getElementById("mr_correo") as HTMLInputElement;
+    const val_mr_nombre=input_mr_nombre.value;
+    const val_mr_apellido=input_mr_apellido.value;
+    const val_mr_correo=input_mr_correo.value;
+    console.log("si llega");
+    console.log(val_mr_nombre);
+    console.log(val_mr_apellido);
+    console.log(val_mr_correo);
+    console.log(backend);
+    const response = await backend.signUp({name:val_mr_nombre, lastName:val_mr_apellido, email:val_mr_correo});
+    console.log("siono");
+    console.log(response);
+    console.log("si llega 2");
+  };
+  
+  const handleProviderSelection = async (provider: string) => {
+    setIsModalOpen(false);
+    console.log(provider);
+    
+    if (provider === "plug") {
+      await connectWithPlug();
+    } else {
+      await loginWithII(provider);
+    }
+  };
+
+  const handleConnect = async() => {
+    setIsModalOpen(true);
+    if(isConnected){
+      await window.ic.plug.disconnect();
+      setTextButton("Conectar Wallet");
+      setIsConnected(false);
+      setIsModalOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -54,12 +186,11 @@ const Navbar: React.FC = () => {
       setIdentity(currentIdentity);
       setIsAuthenticated(!currentIdentity.getPrincipal().isAnonymous());
 
-      // Configurar agente con la identidad actual
       const agent = new HttpAgent({
-        identity,
+        identity: currentIdentity,
         host
       });
-      
+
       if (import.meta.env.VITE_DFX_NETWORK === "local") {
         try {
           await agent.fetchRootKey();
@@ -67,7 +198,7 @@ const Navbar: React.FC = () => {
           console.warn("No se pudo obtener la root key en local:", error);
         }
       }
-      // Crear actor
+
       const actor = createActor(canisterId, { agent });
       setBackend(actor);
     };
@@ -77,21 +208,12 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 20);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleConnect = async() => {
-    console.log("conectando... ", showModal)
-    setShowModal(true)
-  };
 
   return (
     <nav className={cn(
@@ -133,23 +255,34 @@ const Navbar: React.FC = () => {
             </a>
           </div>
           
-          <div className="hidden md:flex items-center">
-            <Button 
+          <div  className="hidden md:flex items-center">
+            <Button id="boton-connect-wallet" 
               onClick={handleConnect}
               variant={isScrolled ? 'primary' : 'outline'} 
               size="sm"
               className={!isScrolled ? 'text-white' : undefined}
             >
-              Connect Wallet
+              {textButton}
             </Button>
           </div>
-          {showModal &&
+
+          {isModalOpen && !isConnected && (
             <ModalProviderSelect
-            isOpen={isModalOpen} 
-            onClose={() => setIsModalOpen(false)} 
-            onSelectProvider={handleProviderSelection}
-          />}
-          
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSelectProvider={handleProviderSelection}
+            />
+          )}
+
+          {showModalRegister && (
+            <div>
+              <input id="mr_nombre" type="text" placeholder="Nombre"></input>
+              <input id="mr_apellido" type="text" placeholder="Apellido"></input>
+              <input id="mr_correo" type="email" placeholder="Correo"></input>
+              <button type="submit" name="" onClick={()=>handleSubmit()}>Enviar</button>
+            </div>
+          )}
+
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button
