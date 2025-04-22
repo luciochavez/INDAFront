@@ -4,8 +4,9 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 
 // 👇 Importa el IDL y el canisterId de tus bindings
 import { idlFactory as backend_idl } from "@/declarations/backend";
-import { canisterId as backend_id } from "@/declarations/backend";
+// import { canisterId as backend_id } from "@/declarations/backend";
 
+const backend_id = import.meta.env.VITE_CANISTER_ID_BACKEND;
 export function useWallet() {
   const [principal, setPrincipal] = useState<string | null>(null);
   const [actor, setActor] = useState<any>(null);
@@ -23,7 +24,8 @@ export function useWallet() {
 
       const connected = await window.ic.plug.requestConnect({
         whitelist: [backend_id],
-        host: "https://mainnet.dfinity.network", // o "http://localhost:4943"
+        // host: "https://mainnet.dfinity.network",
+        host: "http://localhost:4943",
       });
 
       if (connected) {

@@ -2,6 +2,7 @@ import Map "mo:map/Map";
 import { phash; nhash } "mo:map/Map";
 import Types "types";
 import {now} "mo:base/Time";
+import Principal "mo:base/Principal";
 
 shared ({ caller = Deployer }) actor class ( ) = {
 
@@ -32,6 +33,7 @@ shared ({ caller = Deployer }) actor class ( ) = {
   stable var lastPubId = 0;
   
   public shared ({ caller }) func signUp({name: Text; lastName: Text; email: Text}): async {#Ok; #Err: Text}{
+    assert(not Principal.isAnonymous(caller));
     switch (Map.get<Principal, User>(users, phash, caller)) {
       case (?user) {#Err("The caller is already linked to the user " # user.name)};
       case ( null ) {
@@ -46,6 +48,10 @@ shared ({ caller = Deployer }) actor class ( ) = {
         #Ok
       }
     }
+  };
+
+  public shared ({ caller }) func whoAmI(): async Text{
+    Principal.toText(caller)
   };
 
   public shared query ({ caller }) func signIn(): async Types.LoginResult {
