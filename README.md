@@ -1,15 +1,29 @@
-# `inda`
+# `Indasocial`
 
-Welcome to your new `inda` project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+Welcome to `INDASOCIAL` the Web3 platform and to the Internet Computer development community. We are a digital, creative, and social platform made in Mexico. We connect with emerging talents and brands focused on innovation, sustainability, inclusion, and fashion.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+** We are a DIGITAL MEDIA & COMMUNICATION SERVICES platform
+** We CONNECT WITH CREATORS & BRANDS by offering them digital solutions and lasting human connections
+** We build a SOLID COMMUNITY of users who consume our media
+** We TRUST IN 4 PILLARS Sustainability, Inclusion, Innovation, and Fashion
+** We are a WEB3 MARKETPLACE** that connects emerging talent with quality brands
 
-To learn more before you start working with `inda`, see the following documentation available online:
+We are not just a marketplace, but a Web3 platform with *agile payments, trust, and networking*. We are a safe space where creators can receive fast and secure payments, with **exclusive opportunities.**
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Motoko Programming Language Guide](https://internetcomputer.org/docs/current/motoko/main/motoko)
-- [Motoko Language Quick Reference](https://internetcomputer.org/docs/current/motoko/main/language-manual)
+**Indasocial** is not just a directory where brands manually search for creators (like on Upwork or Fiverr), but it uses A.I. algorithms and data to make smart and trustworthy connections between creators and brands.
+
+## **Matchmaking: “We are like Tinder or LinkedIn but applied to talent and brands”.**
+
+Instead of being just another freelance marketplace, Indasocial can curate talent and accurately match brands with emerging creators using AI & advanced filters.
+
+To learn more before you start working with `inda`, see the following documentation available online: -->(agregar links de back end y front end canister y repos pls)
+
+- [PitchDeck] (https://www.canva.com/design/DAGisoumewI/t3DnV4D5JfQ-wkwgJgmkdQ/view?utm_content=DAGisoumewI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h5243588cb3)
+- [Whitepaper] (https://mileoon.notion.site/INDASOCIAL-WHITEPAPER-1a9855c74f39802aa398d9b1b8f0668e?pvs=4)
+- CanisterFrontEnd:  mkcdu-oqaaa-aaaaf-qaofq-cai
+- CanisterBackEnd: meao4-vaaaa-aaaaf-qaoeq-cai
+- FrontUrl (https://mkcdu-oqaaa-aaaaf-qaofq-cai.icp0.io/)
+- Candid Backend (https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=meao4-vaaaa-aaaaf-qaoeq-cai)
 
 If you want to start working on your project right away, you might want to try the following commands:
 
