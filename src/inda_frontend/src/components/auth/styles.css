@@ -1,0 +1,63 @@
+.button {
+    background-color: #2650aa; /* Color de fondo verde */
+    color: white; /* Color del texto blanco */
+    border: none; /* Sin borde */
+    padding: 5px 0px; /* Espaciado interno */
+    text-align: center; /* Centrar texto */
+    text-decoration: none; /* Sin subrayado */
+    display: inline-block; /* Mostrar como bloque en línea */
+    font-size: 16px; /* Tamaño de fuente */
+    margin: 4px 2px; /* Margen */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s; /* Transición suave */
+    box-shadow: 2px 2px 10px rgba(221, 137, 59, 0.363);
+    min-width: 80px;
+
+}
+
+.button:hover {
+    box-shadow: 3px 3px 10px rgba(221, 218, 59, 0.418);
+    background-color: #4a79dd; /* Color de fondo al pasar el mouse */    
+}
+
+/* CustomModal.css */
+
+.modal-overlay {
+    position: fixed;
+    top: 0px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content-providers {
+    /* margin-top: 100px; */
+
+    color: rgb(70, 228, 136);
+    font-size: large;
+    display: flex;
+    flex-direction: column;
+    background: rgb(39, 51, 66);
+    border-width: 1px;
+    border-color: rgb(184, 174, 212);
+    padding: 20px;
+    width: 400px;
+    height: 400px;
+    max-width: 90%;
+    border-radius: 8px;
+    text-align: center;
+    position: relative;
+    
+}
+
+@media (max-width: 768px) { 
+    .button {
+        min-width: 50px;
+    }
+}

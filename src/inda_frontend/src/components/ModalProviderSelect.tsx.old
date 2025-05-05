@@ -1,17 +1,13 @@
 import React from 'react';
 
 interface CustomModalProps {
+  internetIdentityUrl: string;
   isOpen: boolean;
   onClose: () => void;
   onSelectProvider: (providerUrl: string) => void;
 }
 
-const VITE_NETWORK = import.meta.env.VITE_DFX_NETWORK;
-const internetIdentityUrl = VITE_NETWORK === "local"
-  ? "http://localhost:4943/?canisterId=rdmx6-jaaaa-aaaaa-aaadq-cai"
-  : "https://identity.ic0.app";
-
-const ModalProviderSelect: React.FC<CustomModalProps> = ({ isOpen, onClose, onSelectProvider }) => {
+const ModalProviderSelect: React.FC<CustomModalProps> = ({ isOpen, internetIdentityUrl, onClose, onSelectProvider }) => {
   if (!isOpen) return null;
 
   return (

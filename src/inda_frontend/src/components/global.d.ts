@@ -27,8 +27,8 @@ const ckUSDCIdlFactory = ({ IDL }) => {
         amount: number,
         memo: number
       }
-      ) => Promise<{ height: Number }>;
-      requestBalance: () => Promise<Number>;
+      ) => Promise<{ height: number }>;
+      requestBalance: () => Promise<number>;
       sessionManager: {
         sessionData: {
           agent: HttpAgent;

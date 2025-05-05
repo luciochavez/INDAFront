@@ -15,6 +15,7 @@ module {
         principalId: Principal;
         name: Text;
         lastName: Text;
+        kind: Text;
         kyc: Bool;
         country: ?Text;
         guvernamentalID: [GuvernamentalID];
@@ -24,6 +25,7 @@ module {
     public let userDefaultValues = {
         name= "";
         lastName = "";
+        kind = "User";
         email = "";
         phone = null;
         kyc =  false;

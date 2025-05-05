@@ -32,7 +32,7 @@ shared ({ caller = Deployer }) actor class ( ) = {
 
   stable var lastPubId = 0;
   
-  public shared ({ caller }) func signUp({name: Text; lastName: Text; email: Text}): async {#Ok; #Err: Text}{
+  public shared ({ caller }) func signUp({name: Text; lastName: Text; email: Text}): async Types.LoginResult{
     assert(not Principal.isAnonymous(caller));
     switch (Map.get<Principal, User>(users, phash, caller)) {
       case (?user) {#Err("The caller is already linked to the user " # user.name)};
@@ -42,10 +42,9 @@ shared ({ caller = Deployer }) actor class ( ) = {
           name;
           email;
           lastName;
-          
         };
         ignore Map.put<Principal, User>(users, phash, caller, newUser);
-        #Ok
+        #Ok(#user(newUser))
       }
     }
   };
@@ -107,6 +106,7 @@ shared ({ caller = Deployer }) actor class ( ) = {
           phash, 
           caller, 
           {user with
+            kind = "Creator";
             verified = false;
             guvernamentalID = init.guvernamentalID;
             webSite = init.webSite;
@@ -141,6 +141,7 @@ shared ({ caller = Deployer }) actor class ( ) = {
           phash, 
           caller, 
           {user with
+            kind = "Brand";
             verified = false;
             status = init.status;
             brandName: Text = init.brandName;
@@ -175,6 +176,7 @@ shared ({ caller = Deployer }) actor class ( ) = {
           phash, 
           caller, 
           {user with
+            kind = "Partnership";
             verified = false;
             events = [];
             status = init.status;

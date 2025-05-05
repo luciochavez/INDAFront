@@ -3,53 +3,18 @@ import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
 import Button from './Button';
-import { createActor } from "../declarations/backend";
-import { _SERVICE } from "../declarations/backend/backend.did";
-import { AuthClient } from "@dfinity/auth-client";
-import { Actor, ActorSubclass, HttpAgent, AnonymousIdentity, Identity } from "@dfinity/agent";
-import ModalProviderSelect from './ModalProviderSelect';
-// import { connect } from 'http2';
-// import { get } from 'http';
-
-/*
-declare global {
-  interface Window {
-    ic?: {
-      plug?: {
-        requestConnect: (options: { whitelist: string[], host: string }) => Promise<boolean>;
-        getPrincipal: () => Promise<any>;
-        agent?: {
-          getIdentity?: () => any;
-        };
-        createActor: (options: {
-          canisterId: string;
-          interfaceFactory: any;
-        }) => Promise<any>;
-      };
-    };
-  }
-}
-  */
+import {useSession} from '../contexts/sessionContext';
+import UserMenu from './UserMenu';
+// import { _SERVICE } from "../declarations/backend/backend.did";
+// import { AuthClient } from "@dfinity/auth-client";
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [identity, setIdentity] = useState<Identity>(new AnonymousIdentity());
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [textButton, setTextButton] = useState("Connect Wallet");
-  const [isConnected, setIsConnected] = useState(false);
-  const [dataUser, setDataUser] = useState(null);
+
   const [showModalRegister, setShowModalRegister] = useState(false);
 
-  const host = import.meta.env.VITE_DFX_NETWORK === "ic" ? "https://icp0.io" : "http://localhost:4943";
-  const canisterId = import.meta.env.VITE_CANISTER_ID_BACKEND;
-
-  const [backend, setBackend] = useState<ActorSubclass<_SERVICE>>(
-    createActor(canisterId, {
-      agentOptions: { identity: new AnonymousIdentity(), host }
-    })
-  );
+  const { backend, user, isAuthenticated, login, logout, updateUser} = useSession();
 
   const links = [
     { name: 'Candid UI', href: 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=st35g-iaaaa-aaaal-ascpq-cai' },
@@ -59,98 +24,19 @@ const Navbar: React.FC = () => {
     { name: 'Community', href: '#community' }
   ];
 
+
   useEffect(() => {
-    const setupAgent = async () => {
-      const agent = new HttpAgent({
-        identity,
-        host,
-      });
-      setBackend(createActor(canisterId, { agentOptions: { identity, host } }));
-      console.log("whoAmI from useEffect()", await backend.whoAmI());
-    };
-    setupAgent();
-  }, [identity, canisterId, host]);
-
-
-  const logout = async () => {
-    const authClient = await AuthClient.create();
-    await authClient.logout();
-    setIdentity(new AnonymousIdentity());
-    setIsAuthenticated(false);
-    setBackend(
-      createActor(canisterId, {
-        agentOptions: { identity: new AnonymousIdentity(), host }
-      })
-    );
-  };
-
-  const loginWithII = async (providerUrl: string) => {
-    const authClient = await AuthClient.create();
-    await authClient.login({
-      identityProvider: providerUrl,
-      onSuccess: async () => {
-        setIdentity(authClient.getIdentity());
-        console.log(identity.getPrincipal().toText())
-        // setBackend(createActor(canisterId, {
-        //   agentOptions: { identity, host }
-        // }))
-        setIsAuthenticated(true);
-        setTextButton("Desconectar");
-      },
-      onError: (err) => console.error("Error al iniciar sesión:", err),
-    });
-  };
-
-  const connectWithPlug = async () => {
-    if (!window.ic?.plug) {
-      alert("Plug Wallet no está disponible.");
+    if (!isAuthenticated) {
+      setShowModalRegister(false);
       return;
     }
-
-    const connected = await window.ic.plug.requestConnect({
-      whitelist: [canisterId],
-      host,
-    });
-
-    if (connected) {
-      localStorage.setItem("plugConnected", "true");
-      setIsConnected(true);
-      const plugPrincipal = await window.ic.plug.getPrincipal();
-      console.log(plugPrincipal.toText())
-      const plugIdentity = window.ic.plug.agent?.getIdentity?.();
-      setIdentity(plugIdentity);
-
-      setBackend(createActor(canisterId, {
-        agentOptions: { identity: plugIdentity, host }
-      }))
-      
-
-      setIsAuthenticated(true);
-
-      setTextButton("Desconectar");
-      console.log("WhoAmI", await backend.whoAmI())
-
-    } else {
-      console.warn("No se pudo conectar con Plug.");
-      setTextButton("Connectar la Wallet");
-      localStorage.removeItem("plugConnected");
-    }
-  };
-
-  const checkDataUser = async () => {
-    console.log("Verificando usuario")
-    const user = await backend.signIn()
-    const amI = await backend.whoAmI()
-    console.log(user, amI)
-    if ("Ok" in user) {
-      setDataUser(user.Ok)
-      console.log("User ________\n", user.Ok, "\nUser ________")
-    } else {
-      setShowModalRegister(true);
-      setDataUser(null)
-    }
-
-  }
+    const timeout = setTimeout(() => {
+      setShowModalRegister(!user);
+      console.log("User", user);
+    }, 2500);
+   
+    return () => clearTimeout(timeout);
+  }, [user, isAuthenticated]);
 
   const handleSubmit = async () => {
     const input_mr_nombre = document.getElementById("mr_nombre") as HTMLInputElement;
@@ -159,112 +45,15 @@ const Navbar: React.FC = () => {
     const val_mr_nombre = input_mr_nombre.value;
     const val_mr_apellido = input_mr_apellido.value;
     const val_mr_correo = input_mr_correo.value;
-    console.log("si llega");
-    console.log(val_mr_nombre);
-    console.log(val_mr_apellido);
-    console.log(val_mr_correo);
-    console.log(backend);
+
     const response = await backend.signUp({ name: val_mr_nombre, lastName: val_mr_apellido, email: val_mr_correo });
+    console.log("Response", response);
     if ("Ok" in response) {
-      setShowModalRegister(false);
-    }
-    console.log(response);
-    console.log("si llega 2");
-  };
-
-  const handleProviderSelection = async (provider: string) => {
-    setIsModalOpen(false);
-    console.log(provider);
-    console.log("Identitdad antes de la conexion: ", identity.getPrincipal().toText())
-    if (provider === "plug") {
-      await connectWithPlug();
-    } else {
-      await loginWithII(provider);
-    }
-    console.log("Identitdad luego de la conexion: ", identity.getPrincipal().toText())
-  };
-
-  const handleConnect = async () => {
-    if (isAuthenticated) {
-      logout()
-      await window.ic.plug?.disconnect();
-      setTextButton("Conectar Wallet");
-      setIsConnected(false);
-      setIsAuthenticated(false)
-      localStorage.removeItem("plugConnected");
-      setIsModalOpen(false);
-    } else {
-      setIsModalOpen(true);
-    }
-  };
-
-  useEffect(() => {
-    const init = async () => {
-      console.log("init")
-      if (await window.ic?.plug.isConnected()) {
-        console.log("Conectado con Plug wallet")
-        setIsConnected(true);
-        setTextButton("Desconectar");
-
-        const plugPrincipal = await window.ic.plug.getPrincipal();
-        const plugIdentity = window.ic.plug.agent?.getIdentity?.();
-        console.log(plugPrincipal.toText())
-        setIdentity(plugIdentity);
-        setIsAuthenticated(true);
-
-        const backend_idl = (await import("../declarations/backend")).idlFactory;
-
-        // Create HttpAgent with Plug identity explicitly
-        const agent = new HttpAgent({
-          identity: plugIdentity,
-          host,
-        });
-
-        if (import.meta.env.VITE_DFX_NETWORK === "local") {
-          try {
-            await agent.fetchRootKey();
-          } catch (error) {
-            console.warn("No se pudo obtener la root key en local:", error);
-          }
-        }
-
-        // Create actor with explicit agent
-        const plugActor = Actor.createActor(backend_idl, {
-          agent,
-          canisterId,
-        }) as ActorSubclass<_SERVICE>;
-        console.log(canisterId)
-        setBackend(plugActor);
-        checkDataUser();
-        return;
+      if("user" in response.Ok) {
+        updateUser(response.Ok.user);
       }
-
-      const authClient = await AuthClient.create();
-      const currentIdentity = authClient.getIdentity();
-      setIdentity(currentIdentity);
-      console.log("init", currentIdentity.getPrincipal().toText())
-      setIsAuthenticated(!currentIdentity.getPrincipal().isAnonymous());
-
-      const agent = new HttpAgent({
-        identity: identity,
-        host,
-      });
-
-      if (import.meta.env.VITE_DFX_NETWORK === "local") {
-        try {
-          await agent.fetchRootKey();
-        } catch (error) {
-          console.warn("No se pudo obtener la root key en local:", error);
-        }
-      }
-
-      const actor = createActor(canisterId, { agent });
-      setBackend(actor);
-      console.log("hola ", await backend.whoAmI())  
-    };
-
-    init();
-  }, []);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -316,23 +105,18 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="hidden md:flex items-center">
-            <Button id="boton-connect-wallet"
-              onClick={handleConnect}
+            {!isAuthenticated ? <Button id="boton-connect-wallet"
+              onClick={isAuthenticated? logout: login}
               variant={isScrolled ? 'primary' : 'outline'}
               size="sm"
               className={`w-40 ${!isScrolled ? 'text-white' : ''}`}
             >
-              {textButton}
-            </Button>
-          </div>
-
-          {isModalOpen && !isConnected && (
-            <ModalProviderSelect
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              onSelectProvider={handleProviderSelection}
-            />
-          )}
+              Connect
+            </Button>:
+            // <div>hola</div>
+            <UserMenu/>
+            }
+          </div>      
 
           {showModalRegister && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -394,7 +178,9 @@ const Navbar: React.FC = () => {
               )}
             </button>
           </div>
+          
         </div>
+
       </div>
 
       {/* Menú móvil */}
