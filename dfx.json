@@ -7,11 +7,13 @@
     "backend": {
       "main": "src/inda_backend/main.mo",
       "type": "motoko",
+      "specified_id": "meao4-vaaaa-aaaaf-qaoeq-cai",
       "declarations": {
         "output": "./src/declarations/backend"
       }
     },
     "frontend": {
+      "specified_id": "mkcdu-oqaaa-aaaaf-qaofq-cai",
       "source": [
         "src/inda_frontend/dist"
       ],

@@ -113,7 +113,6 @@ const Navbar: React.FC = () => {
             >
               Connect
             </Button>:
-            // <div>hola</div>
             <UserMenu/>
             }
           </div>      
@@ -186,11 +185,12 @@ const Navbar: React.FC = () => {
       {/* Menú móvil */}
       <div
         className={cn(
-          'fixed inset-0 top-16 z-40 bg-white transform transition-transform duration-300 ease-in-out md:hidden',
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          'fixed inset-0 top-16 z-40 transform transition-transform duration-300 ease-in-out md:hidden',
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full',
+          
         )}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1">
+        <div className="px-2 pt-2 pb-3 space-y-1 bg-white">
           {links.map(link => (
             <a
               key={link.name}
@@ -209,11 +209,27 @@ const Navbar: React.FC = () => {
           >
             GitHub
           </a>
+
+          <div className="pt-4 px-3 bg">
+            {!isAuthenticated ? <Button id="boton-connect-wallet"
+              onClick={isAuthenticated? logout: login}
+              variant={isScrolled ? 'primary' : 'outline'}
+              size="sm"
+              className="w-full"
+            >
+              Connect
+            </Button>:
+            <UserMenu/>
+            }
+          </div> 
+
           <div className="pt-4 px-3">
             <Button variant="primary" className="w-full">
               Launch App
             </Button>
           </div>
+
+
         </div>
       </div>
     </nav>

@@ -32,7 +32,7 @@ const UserMenu = () => {
         <div className="relative inline-block">
             {user ?
                 <Button
-                    className="text-black mr-[10px] h-[40px] w-40 bg-blue-500 text-white rounded-md flex justify-center items-center"
+                    className="text-black mr-[10px] h-[40px] w-40 md; bg-blue-500 text-white rounded-md flex justify-center items-center"
                     onClick={() => setShowMenu(!showMenu)}
                 >
                     {user?.name.slice(0, 12)}
