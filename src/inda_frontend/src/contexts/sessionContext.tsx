@@ -7,7 +7,6 @@ import ModalProviderSelect from '../components/auth/ModalProviderSelect';
 
 const canisterId = import.meta.env.VITE_CANISTER_ID_BACKEND as string
 const host = import.meta.env.VITE_DFX_NETWORK === "local" ? "http://localhost:4943/?canisterId=rdmx6-jaaaa-aaaaa-aaadq-cai" : "https://identity.ic0.app";
-console.log(canisterId)
 
 type SessionContextType = {
   user: User| Partnership| UserBrand| UserCreator | null;
@@ -31,7 +30,7 @@ const defaultSessionContext: SessionContextType = {
   updateUser: () => { },
 };
 
-export const SessionContext = createContext<SessionContextType>(defaultSessionContext);
+const SessionContext = createContext<SessionContextType>(defaultSessionContext);
 
 type SessionProviderProps = {
   children: ReactNode;
@@ -40,6 +39,7 @@ type SessionProviderProps = {
 export const SessionProvider = ({ children }: SessionProviderProps) => {
   const [user, setUser] = useState<User | Partnership | UserBrand | UserCreator | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authClient, setAuthClient] = useState<AuthClient | null>(null);
   const [identity, setIdentity] = useState<Identity>(new AnonymousIdentity());
   const [backend, setBackend] = useState<ActorSubclass<_SERVICE>>(
     createActor(canisterId, {
@@ -49,6 +49,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
+    AuthClient.create().then(setAuthClient);
     init();
   }, []);
 
@@ -85,7 +86,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
   }, [isAuthenticated, backend]);
 
   async function init() {
-    const authClient = await AuthClient.create();
+    // const authClient = await AuthClient.create();
     const identity = authClient.getIdentity();
     setIdentity(identity);
 
@@ -95,7 +96,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
   }
 
   const updateUser = (user: User) => {
-    console.log("Actualizando user: ", user)
+
     setUser(user);
   }
 
@@ -104,7 +105,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
   };
 
   const login = async (providerUrl: string) => {
-    const authClient = await AuthClient.create();
+    // const authClient = await AuthClient.create();
     await authClient.login({
       identityProvider: providerUrl,
       onSuccess: () => {
@@ -123,7 +124,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
 
   const logout = async () => {
     setUser(null);
-    const authClient = await AuthClient.create();
+    // const authClient = await AuthClient.create();
     await authClient.logout();
     setIdentity(new AnonymousIdentity());
     setIsAuthenticated(false);

@@ -55,13 +55,13 @@ const UserMenu = () => {
                     {user?.kind === "User" &&
                         <div>
                             <div className="block w-full text-left text-[#cafecafe] px-1 text-[14px]">Register section</div>
-                            <div onMouseDown={() => alert("diseñanr el formulario para registro de creadores de contenido")}>
+                            <div onMouseDown={() => console.log("Diseñanr el formulario para registro de creadores de contenido")}>
                                 <button className="block w-full text-left px-4 py-1 hover:bg-gray-500">As Creator</button>
                             </div>
-                            <div onMouseDown={() => alert("diseñanr el formulario para registro de marcas")}>
+                            <div onMouseDown={() => console.log("Diseñanr el formulario para registro de marcas")}>
                                 <button className="block w-full text-left px-4 py-1 hover:bg-gray-500">As Brand</button>
                             </div>
-                            <div onMouseDown={() => alert("diseñanr el formulario para partnership")}>
+                            <div onMouseDown={() => console.log("Diseñanr el formulario para partnership")}>
                                 <button className="block w-full text-left px-4 py-1 hover:bg-gray-500">As Partnership</button>
                             </div>
                         </div>}
