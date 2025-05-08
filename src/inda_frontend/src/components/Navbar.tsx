@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
   const { backend, user, isAuthenticated, login, logout, updateUser} = useSession();
 
   const links = [
-    { name: 'Candid UI', href: 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=st35g-iaaaa-aaaal-ascpq-cai' },
+    { name: 'Candid UI', href: 'https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=meao4-vaaaa-aaaaf-qaoeq-cai' },
     { name: 'Features', href: '#features' },
     { name: 'Token', href: '#token' },
     { name: 'Roadmap', href: '#roadmap' },
