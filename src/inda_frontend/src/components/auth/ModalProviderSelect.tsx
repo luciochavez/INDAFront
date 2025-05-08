@@ -16,12 +16,12 @@ const ModalProviderSelect: React.FC<CustomModalProps> = ({ isOpen, internetIdent
       <div className="modal-content-providers" onClick={(e) => e.stopPropagation()}>
         <h2 className="mb-8 text-lg font-semibold">Elige un Proveedor de Identidad</h2>
         
-        <button
+        {/* <button
           className="button mb-4 w-full"
           onClick={() => onSelectProvider("plug")}
         >
           🔌 Plug Wallet
-        </button>
+        </button> */}
 
         <button
           className="button mb-4 w-full"
