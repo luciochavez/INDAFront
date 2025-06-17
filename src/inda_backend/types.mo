@@ -82,6 +82,7 @@ module {
 
     public type UserCreator = User and CreatorInitArgs and{
         verified: Bool;
+        registrationFeePaid: Bool;
         publications: [Publication];     
         events: [Event];
         // Agregar campos relacionados al usuario en calidad de creador de contenido

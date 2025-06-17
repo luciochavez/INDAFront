@@ -1,9 +1,16 @@
 {
   "canisters": {
+    
+    "icp_ledger": {
+      "type": "pull",
+      "id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    },
+
     "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
     },
+
     "backend": {
       "main": "src/inda_backend/main.mo",
       "type": "motoko",
