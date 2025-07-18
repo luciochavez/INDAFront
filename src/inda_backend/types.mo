@@ -18,6 +18,8 @@ module {
         kyc: Bool;
         country: ?Text;
         guvernamentalID: [GuvernamentalID];
+        lastPaymentDate: Int;
+        lastMemoPayment: ?Blob;
         // agregar campos comunes a todos lo tipos de usuario
     };
 

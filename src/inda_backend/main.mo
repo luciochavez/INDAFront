@@ -30,8 +30,6 @@ shared ({ caller = Deployer }) actor class ( ) = this {
 
   ignore Map.put<Principal, Text>(admins, phash, Deployer, "deployer");
 
-  stable var creatorFeeRegister = 50: Nat;
-
   ////// Ledgers reference | internal accounts /////////
 
   let Icp_Ledger_Reference = actor("ryjl3-tyaaa-aaaaa-aaaba-cai"): actor {
@@ -62,6 +60,10 @@ shared ({ caller = Deployer }) actor class ( ) = this {
       case (#Whitdrawal)  {{owner; subaccount = ?"withdrawals000000000000000000000"}};
     };
   };
+
+ ////////////// Platform Fees ///////////////////////////////////////
+  stable var creatorFee: Nat64 = 1_000_000_000; // valor en e8s de ICP aproximadamente 50 ICP
+  stable var brandFee: Nat64 =   2_000_000_000; // valor en e8s de ICP aproximadamente 100 ICP
   
  ////////////// Meta Pool Stacking //////////////////////////////////
 
@@ -149,7 +151,7 @@ shared ({ caller = Deployer }) actor class ( ) = this {
     await metaPoolDepositsCanister.completeWithdrawal(data.user, data.available, to);
   };
 
-  public shared ({ caller }) func whitdrawal(amount: ?Nat): async Meta_pool.PayoutResult {
+  public shared ({ caller }) func withdrawalFromStaking(amount: ?Nat): async Meta_pool.PayoutResult {
     assert(isAdmin(caller));
     let withdrawal = await createWithdrawal(amount);
     switch (withdrawal) {
@@ -185,7 +187,7 @@ shared ({ caller = Deployer }) actor class ( ) = this {
   };
 
 
-  ////////////////////////////////////////////////////////////////////
+  ///////////////////////////    Private functions  /////////////////////
 
   func isAdmin(p: Principal): Bool {
     Map.has<Principal, Text>(admins, phash, p)
@@ -197,6 +199,30 @@ shared ({ caller = Deployer }) actor class ( ) = this {
     ignore Map.put<Principal, Text>(admins, phash, p, name);
   };
 
+  func checkPaidMembership(p: Principal, kindUser: Text): Bool {
+    let lastPaymentDate: Int = switch kindUser {
+      case "Creator" {
+        let user = Map.get<Principal, User>(users, phash, p);
+        switch user {
+          case null { 0 };
+          case ( ?user) {
+            user.lastPaymentDate
+          }
+        }
+      };
+      case "Brand" {
+        let user = Map.get<Principal, Brand>(brands, phash, p);
+        switch user {
+          case null { 0 };
+          case ( ?user) {
+            user.lastPaymentDate
+          }
+        }
+      };
+      case _ {0}
+    };
+    return now() < lastPaymentDate * 30 * 24 * 60 * 60 * 1000000000
+  };
 
   /////////////////////////////////////////////////////////////////////
 
@@ -213,6 +239,8 @@ shared ({ caller = Deployer }) actor class ( ) = this {
           name;
           email;
           lastName;
+          lastPaymentDate = 0;
+          lastMemoPayment = null;
           
         };
         ignore Map.put<Principal, User>(users, phash, caller, newUser);
@@ -249,7 +277,7 @@ shared ({ caller = Deployer }) actor class ( ) = this {
     }
   };
 
-  public shared ({ caller }) func requestRegisterAsCreator({init: Types.CreatorInitArgs}): async {#Ok: ICP_Ledger.TransferArg; #Err: Text}{
+  public shared ({ caller }) func requestRegisterAsCreator({init: Types.CreatorInitArgs}): async {#Ok: ICP_Ledger.TransferArgs; #Err: Text}{
     if (Map.has<Principal, Brand>(brands, phash, caller)) {
       return #Err("The caller is already as a brand");
     };
@@ -282,13 +310,15 @@ shared ({ caller = Deployer }) actor class ( ) = this {
             events: [Types.Event] = [];
           }
         );
-        let transeferArgs: ICP_Ledger.TransferArg = {
-          to = getRevenueAccount(#Creator);
-          fee = null;
-          memo = null;
+        let creatorsAccount = getRevenueAccount(#Creator);
+        let memo = Nat64.fromNat(Int.abs(now()));
+        let transeferArgs: ICP_Ledger.TransferArgs = {
+          to = Principal.toLedgerAccount(creatorsAccount.owner, creatorsAccount.subaccount);
+          fee = {e8s = 10000};
+          memo;
           from_subaccount = null;
-          created_at_time = ? Nat64.fromNat(Int.abs(now()));
-          amount = creatorFeeRegister;
+          created_at_time = null;
+          amount = {e8s = creatorFee};
         };
         #Ok(transeferArgs)
       }
